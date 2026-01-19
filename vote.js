@@ -1,17 +1,7 @@
 let currentPair = null;
+let locked = false;
 
-fetch("https://flag-vs-api.salahkouhen.workers.dev/pair")
-  .then(res => res.json())
-  .then(data => {
-    currentPair = data;
-
-    document.getElementById("left-flag").textContent =
-      data.flagA.name;
-
-    document.getElementById("right-flag").textContent =
-      data.flagB.name;
-  });
-
+// click handlers
 document.getElementById("left-flag").onclick = () => {
   submitVote("A");
 };
@@ -20,10 +10,28 @@ document.getElementById("right-flag").onclick = () => {
   submitVote("B");
 };
 
-let locked = false;
+// load a new matchup
+function loadNextPair() {
+  fetch("https://flag-vs-api.salahkouhen.workers.dev/pair")
+    .then(res => res.json())
+    .then(data => {
+      currentPair = data;
+      locked = false;
 
+      document.getElementById("left-flag").textContent =
+        data.flagA.name;
+      document.getElementById("right-flag").textContent =
+        data.flagB.name;
+
+      // reset fills
+      document.getElementById("left-fill").style.width = "50%";
+      document.getElementById("right-fill").style.width = "50%";
+    });
+}
+
+// submit a vote
 function submitVote(choice) {
-  if (locked) return;
+  if (locked || !currentPair) return;
   locked = true;
 
   fetch("https://flag-vs-api.salahkouhen.workers.dev/vote", {
@@ -44,36 +52,15 @@ function submitVote(choice) {
     .then(showResults);
 }
 
+// animate results, then auto-next
 function showResults(results) {
-  const leftPercent = results.percentA;
-  const rightPercent = results.percentB;
-
   document.getElementById("left-fill").style.width =
-    leftPercent + "%";
+    results.percentA + "%";
   document.getElementById("right-fill").style.width =
-    rightPercent + "%";
+    results.percentB + "%";
 
-function loadNextPair() {
-  fetch("https://flag-vs-api.salahkouhen.workers.dev/pair")
-    .then(res => res.json())
-    .then(data => {
-      currentPair = data;
-      locked = false;
-
-      document.getElementById("left-flag").textContent =
-        data.flagA.name;
-      document.getElementById("right-flag").textContent =
-        data.flagB.name;
-
-      document.getElementById("left-fill").style.width = "50%";
-      document.getElementById("right-fill").style.width = "50%";
-    });
+  setTimeout(loadNextPair, 1200);
 }
 
+// initial load
 loadNextPair();
-
-
-  setTimeout(() => {
-    loadNextPair();
-  }, 1200);
-}
