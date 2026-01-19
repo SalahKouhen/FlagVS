@@ -53,6 +53,26 @@ function showResults(results) {
   document.getElementById("right-fill").style.width =
     rightPercent + "%";
 
+function loadNextPair() {
+  fetch("https://flag-vs-api.salahkouhen.workers.dev/pair")
+    .then(res => res.json())
+    .then(data => {
+      currentPair = data;
+      locked = false;
+
+      document.getElementById("left-flag").textContent =
+        data.flagA.name;
+      document.getElementById("right-flag").textContent =
+        data.flagB.name;
+
+      document.getElementById("left-fill").style.width = "50%";
+      document.getElementById("right-fill").style.width = "50%";
+    });
+}
+
+loadNextPair();
+
+
   setTimeout(() => {
     loadNextPair();
   }, 1200);
