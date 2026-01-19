@@ -20,30 +20,26 @@ document.getElementById("right-flag").onclick = () => {
   submitVote("B");
 };
 
+let locked = false;
+
 function submitVote(choice) {
+  if (locked) return;
+  locked = true;
+
   fetch("https://flag-vs-api.salahkouhen.workers.dev/vote", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       flagA: currentPair.flagA.code,
       flagB: currentPair.flagB.code,
       winner: choice
     })
   })
+    .then(() =>
+      fetch(
+        `https://flag-vs-api.salahkouhen.workers.dev/results?flagA=${currentPair.flagA.code}&flagB=${currentPair.flagB.code}`
+      )
+    )
     .then(res => res.json())
-    .then(data => {
-      console.log("Vote accepted:", data);
-    })
-  .then(() => {
-    return fetch(
-      `https://flag-vs-api.salahkouhen.workers.dev/results?flagA=${currentPair.flagA.code}&flagB=${currentPair.flagB.code}`
-    );
-  })
-  .then(res => res.json())
-  .then(results => {
-    console.log("RESULTS:", results);
-  });
+    .then(showResults);
 }
-
