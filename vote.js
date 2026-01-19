@@ -35,5 +35,15 @@ function submitVote(choice) {
     .then(res => res.json())
     .then(data => {
       console.log("Vote accepted:", data);
-    });
+    })
+  .then(() => {
+    return fetch(
+      `https://flag-vs-api.salahkouhen.workers.dev/results?flagA=${currentPair.flagA.code}&flagB=${currentPair.flagB.code}`
+    );
+  })
+  .then(res => res.json())
+  .then(results => {
+    console.log("RESULTS:", results);
+  });
 }
+
