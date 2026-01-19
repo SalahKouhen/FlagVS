@@ -43,3 +43,17 @@ function submitVote(choice) {
     .then(res => res.json())
     .then(showResults);
 }
+
+function showResults(results) {
+  const leftPercent = results.percentA;
+  const rightPercent = results.percentB;
+
+  document.getElementById("left-fill").style.width =
+    leftPercent + "%";
+  document.getElementById("right-fill").style.width =
+    rightPercent + "%";
+
+  setTimeout(() => {
+    loadNextPair();
+  }, 1200);
+}
