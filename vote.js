@@ -2,13 +2,20 @@ let currentPair = null;
 let locked = false;
 
 // click handlers
-document.getElementById("left-flag").onclick = () => {
-  submitVote("A");
-};
+document.getElementById("left-flag").onclick = () => handleClick("A");
+document.getElementById("right-flag").onclick = () => handleClick("B");
 
-document.getElementById("right-flag").onclick = () => {
-  submitVote("B");
-};
+function handleClick(choice) {
+  if (!currentPair) return;
+
+  if (locked) {
+    // results are showing → load next matchup
+    loadNextPair();
+  } else {
+    // voting phase
+    submitVote(choice);
+  }
+}
 
 // load a new matchup
 function loadNextPair() {
@@ -29,9 +36,8 @@ function loadNextPair() {
     });
 }
 
-// submit a vote
+// submit vote
 function submitVote(choice) {
-  if (locked || !currentPair) return;
   locked = true;
 
   fetch("https://flag-vs-api.salahkouhen.workers.dev/vote", {
@@ -52,14 +58,12 @@ function submitVote(choice) {
     .then(showResults);
 }
 
-// animate results, then auto-next
+// show results and wait
 function showResults(results) {
   document.getElementById("left-fill").style.width =
     results.percentA + "%";
   document.getElementById("right-fill").style.width =
     results.percentB + "%";
-
-  setTimeout(loadNextPair, 1200);
 }
 
 // initial load
